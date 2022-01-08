@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=device-width"/>
+
+<title>Pesquisa de títulos</title>
+<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+
+<body>
+
+	<nav class="navbar navbar-inverse navbar-static-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">
+					<img alt="" src="">
+				</a>
+			</div>
+		</div>
+	</nav>
+
+	<div class="alert alert-success alert-dismissible" role="alert"
+		th:if="${!#strings.isEmpty(mensagem)}">
+		<button type="button" class="close" data-dismiss="alert"
+			aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+		<span th:text="${mensagem}"></span>
+	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-heading clearfix">
+			<h1 class="panel-title pull-left">Pesquisa de títulos</h1>
+			<a class="pull-right" th:href="@{/titulos/novo}">Novo título</a>
+		</div>
+		<div class="panel-body">
+		
+			<form class="form-horizontal" th:action="@{/titulos}" method="GET" th:object="${filtro}">
+				<div class="form-group">
+					<div class="col-md-4">
+						<div class="input-group">
+							<input class="form-control" placeholder="Qual título você está procurando?" autofocus="autofocus"
+								th:field="*{descricao}"></input>
+							<span class="input-group-btn">
+								<button type="submit" class="btn btn-default">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</span>
+						</div>
+					</div>
+				</div>
+			</form>
+
+			<div class="table-responsive">
+				<table class="table table-bordered table-striped">
+					<thead>
+						<tr>
+							<th class="text-center col-md-1">#</th>
+							<th>Descrição</th>
+							<th class="text-center col-md-2">Data de vencimento</th>
+							<th class="text-right col-md-2">Valor</th>
+							<th class="text-center col-md-2">Status</th>
+							<th class="col-md-1"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="titulo:${titulos}">
+							<td class="text-center col-md-1" th:text="${titulo.codigo}">#</td>
+							<td th:text="${titulo.descricao}">Descrição</td>
+							<td class="text-center col-md-2"
+								th:text="${{titulo.dataVencimento}}">Data de vencimento</td>
+							<td class="text-right col-md-2" th:text="|R$ ${{titulo.valor}}|">Valor</td>
+							<td class="text-center col-md-2"><span class="label"
+								th:text="${titulo.status.descricao}"
+								th:classappend="${titulo.pendente} ? label-danger : label-success"></span>
+							</td>
+							<td class="text-center col-md-1"><a
+								class="btn btn-link btn-xs"
+								th:href="@{/titulos/{codigo}(codigo=${titulo.codigo})}"
+								title="Editar" rel="tooltip" data-placement="top"> <span
+									class="glyphicon glyphicon-pencil"></span>
+							</a> <a type="button" class="btn btn-link btn-xs" data-toggle="modal"
+								data-target="#confirmacaoExclusaoModal"
+								th:attr="data-codigo=${titulo.codigo}, data-descricao=${titulo.descricao}"
+								title="Excluir" rel="tooltip" data-placement="top"> <span
+									class="glyphicon glyphicon-remove"></span>
+							</a> <a class="btn btn-link btn-xs js-atualizar-status"
+								th:if="${titulo.pendente}" title="Receber" rel="tooltip"
+								data-placement="top"
+								th:href="@{/titulos/{codigo}/receber(codigo=${titulo.codigo})}"
+								th:method="PUT"> <input type="hidden" name="_method"
+									value="PUT" /> <span class="glyphicon glyphicon-check"></span>
+							</a></td>
+						</tr>
+						<tr>
+							<td colspan="6" th:if="${#lists.isEmpty(titulos)}">Nenhum
+								título foi encontrado</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+
+		</div>
+
+		<div class="modal fade" id="confirmacaoExclusaoModal" tabindex="-1"
+			data-keyboard="false" data-backdrop="static">
+			<div class="modal-dialog">
+				<form th:action="@{/titulos}" method="POST">
+					<input type="hidden" name="_method" value="DELETE" />
+
+					<div class="modal-content">
+						<div class="modal-header">
+							<h4 class="modal-title">Você tem certeza?</h4>
+						</div>
+
+						<div class="modal-body">
+							<span></span>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-link" data-dismiss="modal" onclick="javascript:window.location.reload()">Cancelar</button>
+							<button type="submit" class="btn btn-primary">Excluir</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+	</div>
+
+	<script type="text/javascript" src="/js/jquery-2.1.4.min.js"></script>
+	<script type="text/javascript" src="/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/js/bootstrap-datepicker.min.js"></script>
+	<script type="text/javascript" src="/js/bootstrap-datepicker.pt-BR.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.mask.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+	<script type="text/javascript" src="/js/messages_pt_BR.min.js"></script>
+	<script type="text/javascript" src="/js/cobranca.js"></script>
+	
+</body>
+</html>
